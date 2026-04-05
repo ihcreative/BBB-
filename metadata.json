@@ -1,0 +1,8 @@
+{
+  "name": "Bali Black Business (BBB)",
+  "description": "A premium community platform for Black business owners in Bali, featuring networking, AI-driven collaboration matching, and community perks.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

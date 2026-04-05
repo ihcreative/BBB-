@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: members
+    // Document ID: {uid} (Firebase Auth UID)
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - name: string (required)
+    //   - email: string (required, immutable)
+    //   - photo: string
+    //   - businessName: string (required)
+    //   - description: string
+    //   - timeInBali: string
+    //   - referralSource: string
+    //   - offers: list (strings)
+    //   - needs: list (strings)
+    //   - perks: list (maps: {id, title, value})
+    //   - collaborationHours: string
+    //   - isApproved: bool (required, admin-only update)
+    //   - role: string (required, admin-only update)
+    //   - publicVisibility: bool
+    //   - socialLinks: map
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Collection: events
+    // Document ID: {eventId}
+    // Fields:
+    //   - title: string (required)
+    //   - date: timestamp (required)
+    //   - area: string (required)
+    //   - location: string (private)
+    //   - description: string
+    //   - isPublic: bool (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/members/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "isaakhayes@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'businessName', 'isApproved', 'role', 'createdAt']) &&
+             data.uid is string && data.uid.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.businessName is string && data.businessName.size() > 0 && data.businessName.size() < 100 &&
+             data.role in ['member', 'admin'] &&
+             data.isApproved is bool;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /members/{uid} {
+      // Members can read their own full profile. 
+      // Others can only read if the member is approved and publicVisibility is true.
+      // Admins can read everything.
+      allow read: if isOwner(uid) || isAdmin() || (resource.data.isApproved == true && resource.data.publicVisibility == true);
+      
+      // Create: User must be authenticated as the owner. 
+      // Default role must be 'member' and isApproved must be false (unless admin).
+      allow create: if isOwner(uid) && 
+                      isValidUser(request.resource.data) && 
+                      request.resource.data.role == 'member' && 
+                      request.resource.data.isApproved == false;
+      
+      // Update: Owner can update most fields but NOT role or isApproved.
+      // Admin can update anything.
+      allow update: if isAdmin() || (
+        isOwner(uid) && 
+        isValidUser(request.resource.data) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.isApproved == resource.data.isApproved &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.uid == resource.data.uid &&
+        request.resource.data.createdAt == resource.data.createdAt
+      );
+    }
+
+    match /events/{eventId} {
+      // Public events are readable by anyone.
+      // Private events are readable by approved members or admins.
+      allow read: if resource.data.isPublic == true || 
+                    (isAuthenticated() && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.isApproved == true) ||
+                    isAdmin();
+      
+      allow write: if isAdmin();
+    }
+  }
+}

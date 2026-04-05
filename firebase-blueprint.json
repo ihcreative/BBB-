@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "A member of the Bali Black Business community.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "photo": { "type": "string", "description": "Profile photo URL" },
+        "businessName": { "type": "string" },
+        "description": { "type": "string" },
+        "timeInBali": { "type": "string" },
+        "referralSource": { "type": "string" },
+        "offers": { "type": "array", "items": { "type": "string" } },
+        "needs": { "type": "array", "items": { "type": "string" } },
+        "perks": { "type": "array", "items": { "$ref": "Perk" } },
+        "collaborationHours": { "type": "string", "enum": ["1-2", "3-5", "5+"] },
+        "isApproved": { "type": "boolean" },
+        "role": { "type": "string", "enum": ["member", "admin"] },
+        "publicVisibility": { "type": "boolean" },
+        "socialLinks": {
+          "type": "object",
+          "properties": {
+            "whatsapp": { "type": "string" },
+            "instagram": { "type": "string" },
+            "linkedin": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "businessName", "isApproved", "role"]
+    },
+    "Perk": {
+      "title": "Perk",
+      "description": "A community perk offered by a member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "required": ["id", "title", "value"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "A community event.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "area": { "type": "string" },
+        "location": { "type": "string" },
+        "description": { "type": "string" },
+        "isPublic": { "type": "boolean" }
+      },
+      "required": ["title", "date", "area", "isPublic"]
+    }
+  },
+  "firestore": {
+    "/members/{uid}": {
+      "schema": "Member",
+      "description": "Member profiles indexed by their Auth UID."
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Community events."
+    }
+  }
+}
