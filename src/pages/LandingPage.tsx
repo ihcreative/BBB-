@@ -57,7 +57,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-neutral-950 selection:bg-gold-500/30">
       {/* Hero Section */}
-      <section className="relative h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden pt-20">
+      <section className="relative h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.05)_0%,transparent_70%)]" />
         
         <motion.div
@@ -252,7 +252,7 @@ export default function LandingPage() {
       {/* AI Matcher Preview */}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto relative rounded-3xl overflow-hidden glass-card p-12 text-center">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-10 blur-xl" />
+          <div className="absolute inset-0 bg-gold-500/5" />
           
           <div className="relative z-10">
             <div className="w-16 h-16 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto mb-8">

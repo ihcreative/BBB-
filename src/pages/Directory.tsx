@@ -138,7 +138,7 @@ export default function Directory() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 pt-24 pb-20 px-6">
+    <div className="min-h-screen bg-neutral-950 pb-20 px-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">

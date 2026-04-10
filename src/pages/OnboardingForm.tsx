@@ -118,7 +118,7 @@ export default function OnboardingForm() {
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
       {/* Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-neutral-900 z-50">
+      <div className="fixed top-0 left-0 w-full h-1 bg-neutral-900 z-[150]">
         <motion.div 
           className="h-full bg-gold-500"
           initial={{ width: '0%' }}

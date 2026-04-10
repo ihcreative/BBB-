@@ -6,12 +6,15 @@ import AdminDashboard from './pages/AdminDashboard';
 import Directory from './pages/Directory';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { LogIn, LogOut, User as UserIcon, ShieldCheck } from 'lucide-react';
+import { cn } from './lib/utils';
+
+import AdminNav from './components/AdminNav';
 
 function Navbar() {
   const { user, member, signIn, logout, loading } = useAuth();
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-[100] px-6 py-4 flex items-center justify-between bg-neutral-950 border-b border-neutral-900 shadow-2xl min-h-[72px]">
+    <nav className="w-full z-[100] px-6 py-4 flex items-center justify-between bg-neutral-950 border-b border-neutral-900 shadow-2xl min-h-[72px]">
       <Link to="/" className="text-gold-500 font-serif text-2xl tracking-tighter hover:text-gold-400 transition-colors">BBB</Link>
       
       <div className="flex items-center gap-4">
@@ -71,16 +74,36 @@ function Navbar() {
 }
 
 export default function App() {
+  const [isAdminNavVisible, setIsAdminNavVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkVisibility = () => {
+      const hidden = localStorage.getItem('hide-bbb-admin');
+      setIsAdminNavVisible(hidden !== 'true');
+    };
+
+    checkVisibility();
+    window.addEventListener('admin-nav-toggle', checkVisibility);
+    return () => window.removeEventListener('admin-nav-toggle', checkVisibility);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/apply" element={<OnboardingForm />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/directory" element={<Directory />} />
-        </Routes>
+        <AdminNav />
+        <div className={cn("min-h-screen flex flex-col transition-all duration-300", isAdminNavVisible ? "pt-16" : "pt-0")}>
+          <div className="sticky top-0 z-[100]">
+            <Navbar />
+          </div>
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/apply" element={<OnboardingForm />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/directory" element={<Directory />} />
+            </Routes>
+          </main>
+        </div>
       </Router>
     </AuthProvider>
   );
