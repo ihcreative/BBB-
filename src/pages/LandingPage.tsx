@@ -180,6 +180,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* How it Works */}
+      <section className="py-24 px-6 max-w-5xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-serif mb-4">The Path to Excellence</h2>
+          <p className="text-neutral-500 font-light">Our curated journey from application to integration.</p>
+        </div>
+        <div className="grid md:grid-cols-4 gap-8">
+          {[
+            { step: "01", title: "Apply", desc: "Share your vision and business journey in Bali." },
+            { step: "02", title: "Review", desc: "The Village Council reviews every application for alignment." },
+            { step: "03", title: "Connect", desc: "Gain access to the directory and AI collaboration matcher." },
+            { step: "04", title: "Build", desc: "Collaborate on projects, events, and community growth." }
+          ].map((item, i) => (
+            <div key={i} className="relative p-8 glass-card rounded-2xl border border-neutral-900 hover:border-gold-500/20 transition-all group">
+              <div className="text-gold-500/20 font-serif text-6xl absolute top-4 right-4 group-hover:text-gold-500/40 transition-colors">{item.step}</div>
+              <h3 className="text-xl font-serif mb-4 relative z-10">{item.title}</h3>
+              <p className="text-neutral-500 text-sm font-light leading-relaxed relative z-10">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Rotating Member Showcase */}
       <section className="py-24 bg-neutral-900/30">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -279,6 +301,35 @@ export default function LandingPage() {
                 Members Only Feature
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Village Rules */}
+      <section className="py-24 px-6 bg-neutral-900/10">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-4 mb-12 justify-center">
+            <div className="h-px bg-neutral-800 flex-1" />
+            <h2 className="text-2xl font-serif text-neutral-300">The Village Code</h2>
+            <div className="h-px bg-neutral-800 flex-1" />
+          </div>
+          <div className="grid gap-6">
+            {[
+              { title: "Excellence", desc: "We hold ourselves and our businesses to the highest standards." },
+              { title: "Reciprocity", desc: "We give as much as we take. Community is a two-way street." },
+              { title: "Discretion", desc: "What happens in the village, stays in the village. Respect privacy." },
+              { title: "Growth", desc: "We are committed to the continuous elevation of the Black diaspora." }
+            ].map((rule, i) => (
+              <div key={i} className="flex gap-6 items-start p-6 rounded-2xl hover:bg-neutral-900/50 transition-colors">
+                <div className="w-10 h-10 rounded-full border border-gold-500/30 flex items-center justify-center flex-shrink-0 text-gold-500 font-serif">
+                  {i + 1}
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-white mb-2">{rule.title}</h3>
+                  <p className="text-neutral-500 font-light text-sm leading-relaxed">{rule.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

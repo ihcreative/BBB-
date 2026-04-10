@@ -4,6 +4,7 @@ import LandingPage from './pages/LandingPage';
 import OnboardingForm from './pages/OnboardingForm';
 import AdminDashboard from './pages/AdminDashboard';
 import Directory from './pages/Directory';
+import Profile from './pages/Profile';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { LogIn, LogOut, User as UserIcon, ShieldCheck } from 'lucide-react';
 import { cn } from './lib/utils';
@@ -37,7 +38,10 @@ function Navbar() {
                   </Link>
                 )}
                 {member?.isApproved && (
-                  <Link to="/directory" className="text-sm text-neutral-400 hover:text-gold-500 transition-colors px-2 py-1">Directory</Link>
+                  <>
+                    <Link to="/directory" className="text-sm text-neutral-400 hover:text-gold-500 transition-colors px-2 py-1">Directory</Link>
+                    <Link to="/profile" className="text-sm text-neutral-400 hover:text-gold-500 transition-colors px-2 py-1">Profile</Link>
+                  </>
                 )}
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-900 rounded-full border border-neutral-800">
                   {user.photoURL ? (
@@ -101,6 +105,7 @@ export default function App() {
               <Route path="/apply" element={<OnboardingForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/directory" element={<Directory />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </main>
         </div>

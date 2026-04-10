@@ -4,8 +4,9 @@ import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
 import { Member, Event } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, XCircle, Shield, User, Search, Filter, ShieldAlert, Calendar, Plus, Trash2, Globe, Lock } from 'lucide-react';
+import { CheckCircle, XCircle, Shield, User, Search, Filter, ShieldAlert, Calendar, Plus, Trash2, Globe, Lock, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { serverTimestamp } from 'firebase/firestore';
 
 export default function AdminDashboard() {
   const { member: currentMember } = useAuth();
@@ -23,6 +24,30 @@ export default function AdminDashboard() {
     description: '',
     isPublic: true
   });
+
+  const seedData = async () => {
+    if (!window.confirm('This will add sample members, events, and leads. Continue?')) return;
+    
+    try {
+      // Seed Events
+      const sampleEvents = [
+        { title: 'Sunset Networking', date: '2024-05-15', area: 'Canggu', description: 'Monthly meetup for founders.', isPublic: true, createdAt: serverTimestamp() },
+        { title: 'Tech Talk: AI in Bali', date: '2024-05-20', area: 'Ubud', description: 'Deep dive into local tech trends.', isPublic: true, createdAt: serverTimestamp() }
+      ];
+      for (const e of sampleEvents) await addDoc(collection(db, 'events'), e);
+
+      // Seed Leads
+      const sampleLeads = [
+        { title: 'Looking for Web Developer', type: 'opportunity', description: 'Need a React expert for a local villa project.', authorName: 'Sample Admin', authorBusiness: 'BBB Tech', createdAt: serverTimestamp() },
+        { title: 'Villa Rental Partnership', type: 'collaboration', description: 'Offering discounted rates for community events.', authorName: 'Sample Admin', authorBusiness: 'Bali Stays', createdAt: serverTimestamp() }
+      ];
+      for (const l of sampleLeads) await addDoc(collection(db, 'leads'), l);
+
+      alert('Sample data seeded successfully!');
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'seeding');
+    }
+  };
 
   useEffect(() => {
     if (currentMember?.role !== 'admin') return;
@@ -124,19 +149,27 @@ export default function AdminDashboard() {
             <p className="text-neutral-500 font-light">Manage member access and community events for the BBB collective.</p>
           </div>
           
-          <div className="flex bg-neutral-900 rounded-full p-1 border border-neutral-800">
-            {(['members', 'events'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "px-6 py-2 rounded-full text-sm font-medium capitalize transition-all",
-                  activeTab === tab ? "bg-gold-600 text-neutral-950" : "text-neutral-500 hover:text-neutral-300"
-                )}
-              >
-                {tab}
-              </button>
-            ))}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={seedData}
+              className="flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-full text-xs text-neutral-500 hover:text-gold-500 hover:border-gold-500/50 transition-all"
+            >
+              <Database className="w-3 h-3" /> Seed Data
+            </button>
+            <div className="flex bg-neutral-900 rounded-full p-1 border border-neutral-800">
+              {(['members', 'events'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    "px-6 py-2 rounded-full text-sm font-medium capitalize transition-all",
+                    activeTab === tab ? "bg-gold-600 text-neutral-950" : "text-neutral-500 hover:text-neutral-300"
+                  )}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

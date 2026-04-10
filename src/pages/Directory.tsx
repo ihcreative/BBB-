@@ -13,8 +13,9 @@ export default function Directory() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'perks' | 'matcher'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'perks' | 'matcher' | 'leads'>('all');
   const [selectedTag, setSelectedTag] = useState<Tag | 'all'>('all');
+  const [leads, setLeads] = useState<any[]>([]);
 
   // AI Matcher State
   const [aiMatches, setAiMatches] = useState<any[]>([]);
@@ -38,7 +39,16 @@ export default function Directory() {
       setLoading(false);
     });
 
-    return unsubscribe;
+    // Fetch Leads
+    const leadsQuery = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
+    const unsubscribeLeads = onSnapshot(leadsQuery, (snapshot) => {
+      setLeads(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeLeads();
+    };
   }, [currentMember]);
 
   const filteredMembers = useMemo(() => {
@@ -148,7 +158,7 @@ export default function Directory() {
           </div>
           
           <div className="flex bg-neutral-900 p-1 rounded-full border border-neutral-800">
-            {(['all', 'perks', 'matcher'] as const).map((tab) => (
+            {(['all', 'perks', 'leads', 'matcher'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -308,6 +318,60 @@ export default function Directory() {
                   </div>
                 </div>
               ))}
+            </motion.div>
+          )}
+
+          {activeTab === 'leads' && (
+            <motion.div
+              key="leads"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-serif text-white">Village Opportunities</h2>
+                  <p className="text-neutral-500 text-sm font-light">Leads, collaborations, and requests from the collective.</p>
+                </div>
+                <button className="px-6 py-2 bg-neutral-900 border border-neutral-800 rounded-full text-xs text-gold-500 hover:border-gold-500/50 transition-all flex items-center gap-2">
+                  <Briefcase className="w-3 h-3" /> Post Opportunity
+                </button>
+              </div>
+
+              <div className="grid gap-4">
+                {leads.length > 0 ? leads.map((lead, idx) => (
+                  <div key={idx} className="glass-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-gold-500/20 transition-all">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className={cn(
+                          "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest",
+                          lead.type === 'opportunity' ? "bg-green-500/10 text-green-500" : "bg-blue-500/10 text-blue-500"
+                        )}>
+                          {lead.type}
+                        </span>
+                        <span className="text-neutral-600 text-xs">{new Date(lead.createdAt?.toDate()).toLocaleDateString()}</span>
+                      </div>
+                      <h3 className="text-xl font-serif text-white">{lead.title}</h3>
+                      <p className="text-neutral-400 text-sm font-light leading-relaxed">{lead.description}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right hidden md:block">
+                        <div className="text-sm font-medium text-white">{lead.authorName}</div>
+                        <div className="text-xs text-neutral-500">{lead.authorBusiness}</div>
+                      </div>
+                      <button className="p-3 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-500 hover:text-gold-500 hover:border-gold-500/50 transition-all">
+                        <MessageCircle className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-20 glass-card rounded-3xl border-dashed border-neutral-800">
+                    <Briefcase className="w-12 h-12 text-neutral-800 mx-auto mb-4" />
+                    <p className="text-neutral-500 font-light italic">No active opportunities at the moment. Be the first to post!</p>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
 

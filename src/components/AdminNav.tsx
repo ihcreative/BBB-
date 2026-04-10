@@ -24,10 +24,9 @@ export default function AdminNav() {
   const routes = [
     { path: '/', label: 'Home' },
     { path: '/admin', label: 'Dashboard' },
-    { path: '/directory', label: 'Matches' },
-    { path: '/directory', label: 'Profile' },
-    { path: '/directory', label: 'Leads' },
-    { path: '/', label: 'Login' },
+    { path: '/directory', label: 'Directory' },
+    { path: '/profile', label: 'Profile' },
+    { path: '/apply', label: 'Apply' },
   ];
 
   if (!isVisible) return null;
